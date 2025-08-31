@@ -2,6 +2,14 @@ from django.db import models
 from django.contrib.auth.models import User
 import uuid
 
+class Hotel(models.Model):
+    name = models.CharField(max_length=255)
+    location = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+
+    def __str__(self):
+        return self.name
+    
 class Listing(models.Model):
     """
     Represents a single property listing in the application.
@@ -23,6 +31,7 @@ class Booking(models.Model):
     Represents a booking made by a user for a listing.
     """
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='bookings')
+    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name='bookings')
     listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name='bookings')
     check_in_date = models.DateField()
     check_out_date = models.DateField()
@@ -33,7 +42,7 @@ class Booking(models.Model):
     amount = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
-        return f"Booking for {self.customer_name}"
+        return f"Booking for {self.hotel.name} by {self.user.username}"
 
 class Review(models.Model):
     """

@@ -9,6 +9,7 @@ import requests
 import uuid
 from .models import Booking, Payment
 from .tasks import send_payment_confirmation_email
+from .tasks import send_booking_confirmation_email
 
 class ListingViewSet(viewsets.ModelViewSet):
     """
@@ -25,6 +26,17 @@ class BookingViewSet(viewsets.ModelViewSet):
     """
     queryset = Booking.objects.all()
     serializer_class = BookingSerializer
+    
+    def perform_create(self, serializer):
+        """
+        Save the booking and trigger a background task to send a confirmation email.
+        """
+        # Save the booking instance first
+        booking = serializer.save(user=self.request.user)
+        
+        # Trigger the Celery task asynchronously using .delay()
+        # We pass the booking ID because sending the whole object is not recommended.
+        send_booking_confirmation_email.delay(booking.id)
     
     
 CHAPA_API_URL = "https://api.chapa.co/v1/transaction/initialize"

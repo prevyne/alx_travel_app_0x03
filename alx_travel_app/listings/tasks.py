@@ -1,32 +1,50 @@
 from celery import shared_task
 from django.core.mail import send_mail
-from .models import Payment
+from django.conf import settings
+
+from .models import Booking, Hotel
 
 @shared_task
-def send_payment_confirmation_email(payment_id):
+def send_booking_confirmation_email(booking_id):
+    """
+    Sends a confirmation email to the user upon successful booking.
+    """
     try:
-        payment = Payment.objects.get(id=payment_id)
-        booking = payment.booking
-
-        subject = 'Your Booking is Confirmed!'
+        # Retrieve the booking instance from the database using its ID
+        booking = Booking.objects.get(id=booking_id)
+        user = booking.user
+        hotel = booking.hotel
+        
+        subject = f"Booking Confirmation for {hotel.name}"
         message = f"""
-        Dear {booking.customer_name},
+        Hi {user.first_name or user.username},
 
-        Thank you for your payment! Your booking is confirmed.
+        Thank you for your booking at {hotel.name}!
 
-        Booking ID: {booking.id}
-        Amount Paid: {payment.amount} ETB
-        Transaction Reference: {payment.tx_ref}
+        Your booking details are as follows:
+        - Check-in: {booking.check_in_date}
+        - Check-out: {booking.check_out_date}
+        - Guests: {booking.num_guests}
 
-        We look forward to serving you.
+        We look forward to welcoming you.
 
         Best regards,
-        ALX Travel App
+        The ALX Travel Team
         """
-        from_email = 'noreply@alxtravel.com'
-        recipient_list = [booking.customer_email]
-
-        send_mail(subject, message, from_email, recipient_list)
-        return f"Confirmation email sent for payment {payment_id}"
-    except Payment.DoesNotExist:
-        return f"Payment with ID {payment_id} not found."
+        
+        # Send the email
+        send_mail(
+            subject,
+            message,
+            settings.DEFAULT_FROM_EMAIL or 'noreply@alxtravel.com',
+            [user.email],
+            fail_silently=False,
+        )
+        return f"Confirmation email sent to {user.email} for booking {booking_id}"
+    
+    except Booking.DoesNotExist:
+        # Handle the case where the booking might have been deleted before the task ran
+        return f"Booking with id {booking_id} not found."
+    except Exception as e:
+        print(f"An error occurred while sending email for booking {booking_id}: {e}")
+        return f"Failed to send email for booking {booking_id}."

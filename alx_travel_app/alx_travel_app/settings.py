@@ -136,8 +136,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CHAPA_SECRET_KEY = os.getenv("CHAPA_SECRET_KEY")
 
 # Celery Configuration
-CELERY_BROKER_URL = 'redis://localhost:6379/0' # Assumes Redis is running locally
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_BROKER_URL = 'amqp://guest:guest@localhost:5672//'
+CELERY_RESULT_BACKEND = 'rpc://'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Africa/Nairobi'
+
+# EMAIL SETTINGS
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
