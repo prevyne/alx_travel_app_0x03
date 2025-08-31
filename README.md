@@ -1,67 +1,44 @@
-# ALX Travel App 0x02 - Chapa Payment Integration
+# alx_travel_app_0x03
 
-This project integrates the Chapa payment gateway into a Django-based travel booking application. It provides a complete workflow for initiating payments, verifying transactions, and sending automated email confirmations.
+This project enhances the ALX Travel App by introducing asynchronous background tasks using Celery and RabbitMQ to handle email notifications for new bookings.
 
-## Features
+## Milestone 5: Background Email Notifications
 
-- Secure payment processing via Chapa API.
-- Database models for tracking payment transactions.
-- API endpoints for payment initiation and verification.
-- Asynchronous email notifications for successful payments using Celery.
+This feature ensures that the user receives a fast response when creating a booking, as the time-consuming process of sending an email is offloaded to a background worker.
 
-## Setup Instructions
+### Setup and Installation
 
-1.  **Clone the repository:**
+1.  **Clone the repository and install dependencies:**
     ```bash
-    git clone [https://github.com/your-username/alx_travel_app_0x02.git](https://github.com/your-username/alx_travel_app_0x02.git)
-    cd alx_travel_app_0x02
-    ```
-
-2.  **Install dependencies:**
-    ```bash
+    git clone <your-repo-url>
+    cd alx_travel_app_0x03
     pip install -r requirements.txt
     ```
 
-3.  **Set up environment variables:**
-    Create a `.env` file in the root directory and add your Chapa API key:
-    ```ini
-    CHAPA_SECRET_KEY="YOUR_CHAPA_SECRET_KEY"
+2.  **Run RabbitMQ using Docker:**
+    Make sure you have Docker installed and running.
+    ```bash
+    docker run -d -p 5672:5672 -p 15672:15672 --name my-rabbitmq rabbitmq:3-management
     ```
 
-4.  **Run database migrations:**
+### How to Run the Application
+
+You need to run three services in separate terminal windows:
+
+1.  **Start the RabbitMQ Container** (if not already running):
     ```bash
-    python manage.py migrate
+    docker start my-rabbitmq
     ```
 
-5.  **Run the development server and Celery worker:**
+2.  **Start the Celery Worker:**
+    This worker listens for and executes background tasks.
     ```bash
-    # In one terminal
-    python manage.py runserver
-
-    # In another terminal (ensure Redis is running)
     celery -A alx_travel_app worker -l info
     ```
 
-## API Endpoints
-
-### 1. Initiate Payment
-
--   **URL:** `/api/initiate-payment/`
--   **Method:** `POST`
--   **Body:** `{ "booking_id": <your_booking_id> }`
--   **Success Response:** Returns a Chapa checkout URL.
-    ```json
-    {
-        "message": "Hosted Link",
-        "status": "success",
-        "data": {
-            "checkout_url": "[https://checkout.chapa.co/checkout/payment/](https://checkout.chapa.co/checkout/payment/)..."
-        }
-    }
+3.  **Start the Django Development Server:**
+    ```bash
+    python manage.py runserver
     ```
 
-### 2. Verify Payment (Callback)
-
--   **URL:** `/api/verify-payment/<tx_ref>/`
--   **Method:** `GET`
--   **Description:** This URL is used by Chapa as a callback to verify the transaction status. Upon successful verification, the payment status is updated in the database and a confirmation email is sent.
+Now, you can make API requests to `http://127.0.0.1:8000/`. When a new booking is created, a confirmation email will be sent in the background. For development, the email content is printed to the Django server's console.
