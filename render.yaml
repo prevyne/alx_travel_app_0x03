@@ -1,7 +1,5 @@
-# render.yaml
-
 services:
-  # 1. The Web Service (my Django app)
+  # 1. The Web Service (my Django ALX travel app)
   - type: web
     name: alx-travel-app
     env: python
@@ -19,7 +17,7 @@ services:
   # 2. The Redis instance (for Celery)
   - type: redis
     name: celery-broker
-    ipAllowList: [] # Allows access from all my Render services
+    ipAllowList: []
 
   # 3. The Background Worker (for Celery)
   - type: worker
@@ -29,15 +27,20 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: 3.10.13
-      - fromGroup: alx-travel-app-env # Also links to shared environment variables
+      - fromGroup: alx-travel-app-env
 
-# 4. Shared Environment Variables for all services
+  # 4. The Database (PostgreSQL) - THIS WAS THE MISSING PART
+  - type: psql
+    name: alx-travel-app-db
+    ipAllowList: []
+
+# Shared Environment Variables for all services
 envVarGroups:
   - name: alx-travel-app-env
     envVars:
       - key: DATABASE_URL
         fromService:
-          type: psql # Render creates a Postgres database by default for Django
+          type: psql
           name: alx-travel-app-db
           property: connectionString
       - key: REDIS_URL
@@ -45,9 +48,3 @@ envVarGroups:
           type: redis
           name: celery-broker
           property: connectionString
-      
-      # Add my sensitive email credentials here later in the Render dashboard
-      # - key: EMAIL_HOST_USER
-      #   value: my-email@example.com
-      # - key: EMAIL_HOST_PASSWORD
-      #   value: my-password
