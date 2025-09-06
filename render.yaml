@@ -1,19 +1,16 @@
 databases:
-  # 1. Define the PostgreSQL database here
   - name: alx-travel-app-db
-    plan: free # Use the free plan for this project
+    plan: free # Explicitly use the free plan for the database
 
 services:
-  # 2. The Redis instance (for Celery)
   - type: redis
     name: celery-broker
-    plan: free
-    ipAllowList: []
+    plan: free # Explicitly use the free plan for Redis
 
-  # 3. The Web Service (your Django app)
   - type: web
     name: alx-travel-app
     env: python
+    plan: free # ADDED: Explicitly set the web service to the free plan
     buildCommand: "./build.sh"
     startCommand: "gunicorn alx_travel_app.wsgi"
     envVars:
@@ -23,34 +20,29 @@ services:
         generateValue: true
       - key: DEBUG
         value: False
-      - key: DATABASE_URL # Get the database URL from the database service
+      - key: DATABASE_URL
         fromDatabase:
           name: alx-travel-app-db
           property: connectionString
-      - key: REDIS_URL # Get the Redis URL from the Redis service
+      - key: REDIS_URL
         fromService:
           type: redis
           name: celery-broker
           property: connectionString
-      # Add your sensitive email credentials later in the Render dashboard's Environment tab
-      # - key: EMAIL_HOST_USER
-      #   sync: false
-      # - key: EMAIL_HOST_PASSWORD
-      #   sync: false
 
-  # 4. The Background Worker (for Celery)
   - type: worker
     name: celery-worker
     env: python
+    plan: free # ADDED: Explicitly set the worker to the free plan
     startCommand: "celery -A alx_travel_app worker -l info"
     envVars:
       - key: PYTHON_VERSION
         value: 3.10.13
-      - key: DATABASE_URL # The worker also needs access to the database
+      - key: DATABASE_URL
         fromDatabase:
           name: alx-travel-app-db
           property: connectionString
-      - key: REDIS_URL # The worker needs the Redis URL to connect to Celery
+      - key: REDIS_URL
         fromService:
           type: redis
           name: celery-broker
