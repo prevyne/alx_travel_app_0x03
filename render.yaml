@@ -13,7 +13,7 @@ services:
     env: python
     plan: free # ADDED: Explicitly set the web service to the free plan
     buildCommand: "./build.sh"
-    startCommand: "gunicorn alx_travel_app.wsgi"
+    startCommand: "cd alx_travel_app && gunicorn alx_travel_app.wsgi"
     envVars:
       - key: PYTHON_VERSION
         value: 3.10.13
