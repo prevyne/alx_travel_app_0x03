@@ -6,7 +6,8 @@ services:
   - type: redis
     name: celery-broker
     plan: free # Explicitly use the free plan for Redis
-
+    ipAllowList: =[]
+    
   - type: web
     name: alx-travel-app
     env: python
