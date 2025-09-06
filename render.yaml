@@ -1,5 +1,5 @@
 services:
-  # 1. The Web Service (my Django ALX travel app)
+  # 1. The Web Service (My Django ALX travel app)
   - type: web
     name: alx-travel-app
     env: python
@@ -9,10 +9,10 @@ services:
       - key: PYTHON_VERSION
         value: 3.10.13
       - key: SECRET_KEY
-        generateValue: true # Render will automatically create a secure secret key
+        generateValue: true
       - key: DEBUG
         value: False
-      - fromGroup: alx-travel-app-env # Links to the shared environment variables
+      - fromGroup: alx-travel-app-env
 
   # 2. The Redis instance (for Celery)
   - type: redis
@@ -29,8 +29,8 @@ services:
         value: 3.10.13
       - fromGroup: alx-travel-app-env
 
-  # 4. The Database (PostgreSQL) - THIS WAS THE MISSING PART
-  - type: psql
+  # 4. The Database (PostgreSQL)
+  - type: postgres
     name: alx-travel-app-db
     ipAllowList: []
 
@@ -40,7 +40,7 @@ envVarGroups:
     envVars:
       - key: DATABASE_URL
         fromService:
-          type: psql
+          type: postgres
           name: alx-travel-app-db
           property: connectionString
       - key: REDIS_URL
