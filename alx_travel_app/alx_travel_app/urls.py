@@ -5,6 +5,7 @@ from django.urls import path, include
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
+from django.views.generic.base import RedirectView 
 
 # This is the standard setup for drf-yasg
 schema_view = get_schema_view(
@@ -23,6 +24,8 @@ schema_view = get_schema_view(
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('listings.urls')),
+    #redirect the root URL to the Swagger UI
+    path('', RedirectView.as_view(url='/swagger/', permanent=True)),
     
     # These paths for Swagger/ReDoc and must be present for production
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
