@@ -34,7 +34,6 @@ services:
   - type: worker
     name: celery-worker
     env: python
-    plan: free # ADDED: Explicitly set the worker to the free plan
     startCommand: "celery -A alx_travel_app worker -l info"
     envVars:
       - key: PYTHON_VERSION
