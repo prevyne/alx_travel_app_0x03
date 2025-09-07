@@ -34,6 +34,7 @@ services:
   - type: worker
     name: celery-worker
     env: python
+    buildCommand: "./build.sh"
     startCommand: "cd alx_travel_app && python -m celery -A alx_travel_app worker -l info"
     envVars:
       - key: PYTHON_VERSION
