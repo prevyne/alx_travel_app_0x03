@@ -41,10 +41,7 @@ You need to run three services in separate terminal windows:
     python manage.py runserver
     ```
 
-<<<<<<< Updated upstream
-Now, you can make API requests to `http://127.0.0.1:8000/`. When a new booking is created, a confirmation email will be sent in the background. For development, the email content is printed to the Django server's console.
-=======
 Now, you can make API requests to `http://127.0.0.1:8000/`. When a new booking is created, a confirmation email will be sent in the background. For development, the email content is printed to the Django server's console.
 
 ## Live Render deployment link
-https://dashboard.render.com/web/srv-d2u556fdiees73ckcbg0/deploys/dep-d2ucahmr433s73e6asv0
+https://alx-travel-app-jk9m.onrender.com/
